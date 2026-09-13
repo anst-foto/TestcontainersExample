@@ -1,0 +1,6 @@
+@TestcontainersExample.WebApi_HostAddress = http://localhost:5069
+
+GET {{TestcontainersExample.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
