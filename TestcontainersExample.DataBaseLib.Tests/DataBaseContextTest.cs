@@ -33,7 +33,6 @@ public class DataBaseContextTest : IClassFixture<DataBaseFixture>
         Assert.Multiple(
             () => Assert.Equal("Test", savedItem.Title),
             () => Assert.Multiple(() => Assert.Equal(2, savedItem.Authors.Count),
-                () => Assert.Equal("Test1", savedItem.Authors[0].FullName),
-                () => Assert.Equal("Test2", savedItem.Authors[1].FullName)));
+                () => Assert.Equal(book, savedItem)));
     }
 }
