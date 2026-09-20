@@ -1,0 +1,497 @@
+{
+  "info": {
+    "name": "TestcontainersExample WebApi",
+    "description": "Коллекция тестов для WebApi: авторы, книги, health.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5069",
+      "type": "string"
+    },
+    {
+      "key": "authorId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "bookId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "nonExistentGuid",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health - должен вернуть 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Ответ получен за разумное время', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Authors",
+      "item": [
+        {
+          "name": "POST /api/v1/authors - создать автора",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Content-Type JSON', function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('В ответе есть Id', function () {",
+                  "    pm.expect(body).to.have.property('id');",
+                  "    pm.expect(body.id).to.be.a('string');",
+                  "    pm.expect(body.id).to.match(/^[0-9a-fA-F-]{36}$/);",
+                  "});",
+                  "",
+                  "pm.test('FullName совпадает', function () {",
+                  "    pm.expect(body.fullName).to.eql('Иван Иванов');",
+                  "});",
+                  "",
+                  "pm.test('Books — пустой массив', function () {",
+                  "    pm.expect(body.books).to.be.an('array').that.is.empty;",
+                  "});",
+                  "",
+                  "// Сохраняем Id для следующих запросов",
+                  "pm.collectionVariables.set('authorId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"fullName\": \"Иван Иванов\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/authors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "authors"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/v1/authors - создать второго автора",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('FullName второго автора', function () {",
+                  "    pm.expect(body.fullName).to.eql('Пётр Петров');",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('authorId2', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"fullName\": \"Пётр Петров\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/authors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "authors"]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v1/authors - получить всех авторов",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('Ответ — массив', function () {",
+                  "    pm.expect(body).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Массив не пустой', function () {",
+                  "    pm.expect(body.length).to.be.above(0);",
+                  "});",
+                  "",
+                  "pm.test('Каждый автор содержит Id и FullName', function () {",
+                  "    body.forEach(function (a) {",
+                  "        pm.expect(a).to.have.property('id');",
+                  "        pm.expect(a).to.have.property('fullName');",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/authors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "authors"]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v1/authors/{id} - получить автора по Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('Id совпадает с запрошенным', function () {",
+                  "    pm.expect(body.id).to.eql(pm.collectionVariables.get('authorId'));",
+                  "});",
+                  "",
+                  "pm.test('FullName не пустой', function () {",
+                  "    pm.expect(body.fullName).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/authors/{{authorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "authors", "{{authorId}}"]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v1/authors/{id} - несуществующий Id → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/authors/{{nonExistentGuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "authors", "{{nonExistentGuid}}"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/v1/authors - пустое FullName (ожидаем 400 или 500)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 400 или 500', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 500]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"fullName\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/authors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "authors"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Books",
+      "item": [
+        {
+          "name": "POST /api/v1/books - создать книгу с двумя авторами",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Content-Type JSON', function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('В ответе есть Id', function () {",
+                  "    pm.expect(body).to.have.property('id');",
+                  "    pm.expect(body.id).to.match(/^[0-9a-fA-F-]{36}$/);",
+                  "});",
+                  "",
+                  "pm.test('Title совпадает', function () {",
+                  "    pm.expect(body.title).to.eql('Война и мир');",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('bookId', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Война и мир\",\n    \"authors\": [\n        { \"id\": \"{{authorId}}\" },\n        { \"id\": \"{{authorId2}}\" }\n    ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "books"]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v1/books - получить все книги",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('Ответ — массив', function () {",
+                  "    pm.expect(body).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Массив не пустой', function () {",
+                  "    pm.expect(body.length).to.be.above(0);",
+                  "});",
+                  "",
+                  "pm.test('Каждая книга содержит Id и Title', function () {",
+                  "    body.forEach(function (b) {",
+                  "        pm.expect(b).to.have.property('id');",
+                  "        pm.expect(b).to.have.property('title');",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "books"]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v1/books/{id} - получить книгу по Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('Id совпадает с запрошенным', function () {",
+                  "    pm.expect(body.id).to.eql(pm.collectionVariables.get('bookId'));",
+                  "});",
+                  "",
+                  "pm.test('Title не пустой', function () {",
+                  "    pm.expect(body.title).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books/{{bookId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "books", "{{bookId}}"]
+            }
+          }
+        },
+        {
+          "name": "GET /api/v1/books/{id} - несуществующий Id → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books/{{nonExistentGuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "books", "{{nonExistentGuid}}"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/v1/books - пустой Title (ожидаем 400 или 500)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Статус 400 или 500', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 500]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/books",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "books"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
