@@ -1,4 +1,12 @@
 <Solution>
+  <Folder Name="/ci_cd/">
+    <File Path=".github/workflows/ci.yml" />
+  </Folder>
+  <Folder Name="/docker/">
+    <File Path=".dockerignore" />
+    <File Path="docker-compose.yml" />
+    <File Path="Dockerfile" />
+  </Folder>
   <Project Path="TestcontainersExample.DataBaseLib.Tests/TestcontainersExample.DataBaseLib.Tests.csproj" />
   <Project Path="TestcontainersExample.DataBaseLib/TestcontainersExample.DataBaseLib.csproj" />
   <Project Path="TestcontainersExample.WebApi/TestcontainersExample.WebApi.csproj" />

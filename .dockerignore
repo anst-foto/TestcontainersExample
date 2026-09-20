@@ -1,0 +1,19 @@
+# Build context exclusions for efficient Docker builds
+.git
+.gitignore
+.github
+.vs
+.vscode
+bin
+obj
+*.user
+*.suo
+*.sln.iml
+node_modules
+npm-debug.log
+README.md
+LICENSE
+.DS_Store
+Thumbs.db
+.idea
+.env.local

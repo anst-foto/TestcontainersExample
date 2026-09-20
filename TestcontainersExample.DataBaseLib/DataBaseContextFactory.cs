@@ -10,13 +10,13 @@ public class DataBaseContextFactory : IDesignTimeDbContextFactory<DataBaseContex
     public DataBaseContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<DataBaseContext>();
- 
-        var  connectionString  = new ConfigurationBuilder()
+
+        var connectionString = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json")
             .Build()
             .GetConnectionString("DefaultConnection");
-        
+
         optionsBuilder
             .UseLazyLoadingProxies()
             .UseNpgsql(connectionString);
