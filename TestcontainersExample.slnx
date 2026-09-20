@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="TestcontainersExample.DataBaseContext/TestcontainersExample.DataBaseContext.csproj" />
+  <Project Path="TestcontainersExample.DataBaseLib.Tests/TestcontainersExample.DataBaseLib.Tests.csproj" />
+  <Project Path="TestcontainersExample.DataBaseLib/TestcontainersExample.DataBaseLib.csproj" />
+  <Project Path="TestcontainersExample.WebApi/TestcontainersExample.WebApi.csproj" />
 </Solution>
